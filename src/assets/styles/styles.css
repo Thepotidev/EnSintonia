@@ -1,0 +1,337 @@
+* {
+    padding: unset;
+    margin: unset;
+    border: unset;
+    outline: unset;
+    text-decoration: unset;
+    list-style: none;
+    box-sizing: border-box;
+    font-size: 18px;
+}
+
+:root {
+    --margin-page: 60px;
+    --color-primary: #0D0D0D;
+    --color-secondary: #3d3b3bfb;
+    --color-action: #05F2AF;
+    --color-letters: #9E77F2;
+}
+
+@font-face {
+    font-family: text;
+    src: url(/fonts/Blue\ Screen\ Personal\ Use.ttf);
+}
+
+body {
+    background-color: var(--color-primary);
+    color: var(--color-letters);
+    font-family: text;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transform: none !important;
+}
+
+header {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    z-index: 10;
+    background-color: var(--color-primary);
+    padding: 10px 0;
+}
+
+header img {
+    width: 100px;
+    height: 100px;
+    margin: 0 20px;
+}
+
+main {
+    padding-top: 0px; /* Espacio para el header */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    padding-bottom: 0px; /* Espacio para el footer */
+    position: relative;
+    transform: none !important;
+}
+
+main h1 {
+    font-size: 180px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    /* transform: translate(-50%, -50%); */
+    z-index: 3;
+    pointer-events: none;
+    animation: helloBreathing 3s ease-in-out infinite alternate; /* Animación de respiración */
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Estilos para las tarjetas musicales */
+#cards-music {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+    transition: all 1s ease-in-out;
+    cursor: grab; /* Muestra un cursor de "agarrar" cuando el mouse está encima */
+    scrollbar-width: none !important; /* Oculta el scrollbar */
+}
+
+#cards-music.active-drag {
+    cursor: grabbing; /* Muestra un cursor de "arrastrando" cuando se está haciendo clic */
+}
+
+.tarjetas-musicales {
+    background-color: var(--color-secondary);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    padding: 20px;
+    width: 180px;
+    height: auto;
+    min-height: 220px;
+    flex-shrink: 0; /* Evita que las tarjetas se reduzcan de tamaño */
+    flex-grow: 0; /* Evita que las tarjetas crezcan más allá de su tamaño base */
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    transform: scale(0.1); /* Comienza en una posición neutra */
+    opacity: 0; /* Las tarjetas comienzan ocultas */
+    transition: transform 1.5s cubic-bezier(.68,-0.55,.27,1.55), opacity 1s ease-in-out, box-shadow 0.3s;
+    will-change: transform, opacity; /* Sugerencia al navegador para optimización */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+} 
+
+.tarjetas-musicales:hover {
+    transform: scale(1.07) rotate(-2deg);
+    box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.47);
+}
+
+.music-cover {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0; /* Evita que la imagen se reduzca de tamaño */
+}
+
+/* AJUSTES PARA EL CONTENIDO DE LA TARJETA (Nombres) */
+.song-title, .artist-name {
+    width: 100% !important; /* Ocupa todo el ancho disponible */
+    overflow: hidden !important; /* Oculta el texto que desborde */
+    text-overflow: ellipsis !important; /* Añade puntos suspensivos si el texto se recorta */
+    white-space: nowrap !important; /* Mantiene el texto en una sola línea */
+    margin-top: 5px; /* Pequeño margen entre elementos */
+    text-align: center;
+}
+
+.song-title {
+    font-size: 18px !important; /* Un poco más grande para el título */
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.artist-name {
+    font-size: 14px !important; /* Más pequeño para el artista */
+    opacity: 0.8;
+}
+
+/* Animación inicial: cartas girando alrededor del Hello! */
+body.inicio #cards-music {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    z-index: 1;
+    opacity: 1; /* Asegura que las tarjetas sean visibles */
+    transition: opacity 0.5s ease-in-out; /* Para una transición suave */
+    white-space: normal;
+    padding: 0;
+    justify-content: center;
+}
+
+body.inicio .tarjetas-musicales {
+    position: absolute !important; /* Mantiene las tarjetas posicionadas para la órbita */
+    opacity: 1;
+    animation: ovalOrbit 3s forwards;
+    z-index: 2;
+    pointer-events: auto; /* Permite la interacción con las tarjetas */
+}
+
+/* Las tarjetas que NO están en la órbita inicial deben estar ocultas. */
+/* Asumimos que las que giran tienen un --angle establecido en JS. Las demás no. */
+.tarjetas-musicales:not([style*="--angle"]) {
+    opacity: 0; /* Oculta las tarjetas que no giran inicialmente */
+    pointer-events: none; /* No interactuable si está oculta */
+    /* Aseguramos que no tengan ninguna animación o transform que las muestre */
+    animation: none !important;
+    transform: scale(0.1);
+}
+
+@keyframes ovalOrbit {
+    from {
+        /* Comienza desde una posición neutra */
+        transform: rotate(0deg) translateX(0px) translateY(0px) rotate(0deg) scale(0.1); 
+        opacity: 0; /* Coincide con la opacidad inicial para una aparición suave */
+    }
+    to {
+        /* Termina en la posición ovalada calculada con rotación */
+        transform: 
+            rotate(var(--angle, 0deg)) 
+            translateX(0px) 
+            translateY(250px)
+            rotate(calc(-1 * var(--angle, 0deg))) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes aparecer {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Animación de "respiración" para el Hello! */
+@keyframes helloBreathing {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.03); opacity: 0.95; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+body.inicio main h1 {
+    animation: helloBreathing 3s ease-in-out infinite alternate;
+}
+
+body.fade-out #cards-music {
+    opacity: 0; /* Oculta el contenedor de órbita */
+    pointer-events: none; /* Desactiva la interacción durante la transición */
+}
+
+body.fade-out main h1 {
+    opacity: 1;
+    animation: helloBreathing 3s ease-in-out infinite alternate; /* Mantiene la animación de respiración */
+}
+
+/* Cuando termina la animación, las cartas se ordenan abajo */
+body.ordenado #cards-music {
+    position: static;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    justify-content: flex-start;
+    padding: 0 var(--margin-page);
+    gap: 30px;
+    height: auto;
+    pointer-events: auto;
+    z-index: 2;
+    transition: all 0.8s ease-in-out;
+}
+
+body.ordenado .tarjetas-musicales {
+    position: static;
+    opacity: 1;
+    width: 180px; /* Asegura que cada tarjeta tenga un ancho fijo */
+    height: auto; /* Permite que la altura se ajuste al contenido */
+    flex-shrink: 0; /* IMPIDE QUE LA TARJETA SE ENCOJA */
+    flex-grow: 0;  /* IMPIDE QUE LA TARJETA CREZCA */
+    flex-basis: 180px; /* Tamaño base en flexbox */
+    transform: translateX(0);
+    /* La animación de serpiente DEBE continuar, pero ahora en su posición horizontal */
+    animation: slideInFromRight 1s ease-in-out forwards; /* Aplica la animación */
+    animation-delay: calc(var(--index) * 0.1s); /* Multiplica por un valor pequeño para escalonar */
+    will-change: transform;
+    pointer-events: auto; /* Permite la interacción con las tarjetas ordenadas */
+}
+
+/* Animación de "Serpiente" para las tarjetas en estado ordenado */
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100vw) scale(0.1); /* Comienza 100% del viewport ancho a la DERECHA */
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) scale(1); /* Termina en su posición normal */
+        opacity: 1;
+    }
+}
+
+/* Estilos para el fondo */
+#background-music {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: none;
+    transition: backround-image 0.6s ease-in-out, filter 0.6s ease-in-out;
+    filter: blur(32px) brightness(0.7);
+    pointer-events: none;
+}
+
+body.inicio #background-music {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Estilos para la imagen expandida */
+body.imagen-expandida {
+    overflow: hidden; /* Evita el scroll cuando la imagen está expandida */
+}
+
+body.ocultar-hello main h1 {
+    opacity: 0 !important; /* Oculta el texto de bienvenida */
+    pointer-events: none !important; /* Evita la interacción con el texto oculto */
+    animation: none !important; /* Detiene cualquier animación en el texto */
+}
+
+/* Overlay para la imagen expandida */
+.overlay-imagen-expandida {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro semitransparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999999 !important; /* Asegura que esté por encima de todo */
+    opacity: 0;
+    pointer-events: none; /* Evita la interacción mientras está oculto */
+    transition: opacity 0.3s ease-in-out; /* Transición suave para la aparicion */
+    transform: none !important;
+    will-change: opacity, transform;
+}
+
+/* Mostrar el overlay cuando la clase 'imagen-expandida' esta en el body */
+body.imagen-expandida .overlay-imagen-expandida {
+    opacity: 1;
+    pointer-events: auto; /* Hacemos el overlay interactuable */
+}
+
+/* Estilos para la imagen dentro del overlay */
+.imagen-expandida-content {
+    max-width: 90%; /* Máximo 90% del ancho del viewport */
+    max-height: 90%; /* Máximo 90% de la altura del viewport */
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.7); /* Sombra para darle profundidad */
+    object-fit: contain; /* Ajusta la imagen dentro de sus límites sin recortar */
+    transition: transform 0.3s ease-out; /* Transición para posible hover o efectos futuros */
+}
